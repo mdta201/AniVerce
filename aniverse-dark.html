@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniVerse — Watch Anime Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkBg: '#0b0f19',
+            cardBg: '#131b2e',
+            accent: '#7c3aed',
+            accentSoft: '#a78bfa',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --glass: rgba(19, 27, 46, 0.55);
+      --glass-strong: rgba(19, 27, 46, 0.78);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #7c3aed;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        linear-gradient(165deg, rgba(11,15,25,0.92) 0%, rgba(15,23,42,0.88) 45%, rgba(11,15,25,0.95) 100%),
+        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2400&q=85') center/cover fixed;
+      background-blend-mode: multiply;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -15%, rgba(124,58,237,0.22), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 90% 70%, rgba(99,102,241,0.12), transparent 50%),
+        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(14,165,233,0.08), transparent 45%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page-wrap { position: relative; z-index: 1; }
+
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(22px) saturate(1.35);
+      -webkit-backdrop-filter: blur(22px) saturate(1.35);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .glass-strong {
+      background: var(--glass-strong);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .glass-card {
+      background: rgba(19, 27, 46, 0.5);
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid rgba(255,255,255,0.07);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 22px 45px rgba(124,58,237,0.2), 0 8px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+      border-color: rgba(167,139,250,0.35);
+    }
+
+    .btn-3d {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 0 rgba(91,33,182,0.45), 0 10px 24px rgba(124,58,237,0.3);
+    }
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 rgba(91,33,182,0.5), 0 14px 28px rgba(124,58,237,0.35);
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(91,33,182,0.4), 0 4px 12px rgba(124,58,237,0.25);
+    }
+    .btn-ghost-3d {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 0 rgba(30,41,59,0.8), 0 8px 16px rgba(0,0,0,0.25);
+    }
+    .btn-ghost-3d:hover { transform: translateY(-2px); }
+    .btn-ghost-3d:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(30,41,59,0.7);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.6); }
+
+    .hero-gradient {
+      background: linear-gradient(0deg, #0b0f19 0%, rgba(11,15,25,0.75) 40%, rgba(11,15,25,0.2) 100%);
+    }
+    .hero-side {
+      background: linear-gradient(90deg, #0b0f19 0%, rgba(11,15,25,0.9) 30%, rgba(11,15,25,0.5) 60%, transparent 100%);
+    }
+
+    .view { display: none; animation: fadeUp 0.4s ease; }
+    .view.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #toast {
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(14px);
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb w-96 h-96 bg-violet-600/40 top-10 -left-24"></div>
+  <div class="orb w-80 h-80 bg-indigo-500/30 bottom-32 right-0"></div>
+  <div class="orb w-64 h-64 bg-sky-600/20 top-1/2 left-1/4"></div>
+
+  <div class="page-wrap min-h-screen flex flex-col">
+    <header class="sticky top-0 z-50">
+      <div class="glass-strong border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center justify-between">
+          <a href="#" onclick="showView('home'); return false;" class="flex items-center gap-3 group">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-violet-600/40 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-play text-white text-lg"></i>
+            </div>
+            <div class="flex flex-col leading-none">
+              <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-violet-200 to-indigo-300 bg-clip-text text-transparent">AniVerse</span>
+              <span class="text-[10px] text-slate-400 tracking-widest uppercase font-medium mt-0.5">Watch · Explore · Enjoy</span>
+            </div>
+          </a>
+
+          <nav class="hidden md:flex items-center gap-1">
+            <button onclick="showView('home')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all" data-view="home">
+              <i class="fa-solid fa-house text-xs"></i><span>Home</span>
+            </button>
+            <button onclick="showView('anime')" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all" data-view="anime">
+              <i class="fa-solid fa-film text-xs"></i><span>Anime</span>
+            </button>
+            <button onclick="showView('genres')" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all" data-view="genres">
+              <i class="fa-solid fa-layer-group text-xs"></i><span>Genres</span>
+            </button>
+            <button onclick="showView('popular')" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all" data-view="popular">
+              <i class="fa-solid fa-star text-xs"></i><span>Popular</span>
+            </button>
+            <button onclick="openSearch()" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i><span>Search</span>
+            </button>
+          </nav>
+
+          <div class="flex items-center gap-3">
+            <button onclick="window.location.href='index.html'" class="w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-400 hover:text-violet-300 transition-all" title="Switch to Light">
+              <i class="fa-solid fa-sun text-sm"></i>
+            </button>
+            <button onclick="showToast('No new notifications')" class="relative w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-400 hover:text-violet-300 transition-all">
+              <i class="fa-solid fa-bell text-sm"></i>
+              <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
+            </button>
+            <div class="hidden sm:flex items-center gap-2 pl-1">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Profile" class="w-10 h-10 rounded-xl object-cover ring-2 ring-violet-500/40 shadow-md">
+            </div>
+            <button onclick="toggleMobile()" class="md:hidden w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-400">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden glass-strong border-b border-white/5 px-4 py-3 space-y-1">
+        <button onclick="showView('home'); toggleMobile()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-violet-300 bg-violet-500/15">Home</button>
+        <button onclick="showView('anime'); toggleMobile()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5">Anime</button>
+        <button onclick="showView('genres'); toggleMobile()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5">Genres</button>
+        <button onclick="showView('popular'); toggleMobile()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5">Popular</button>
+        <button onclick="openSearch(); toggleMobile()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-white/5">Search</button>
+      </div>
+    </header>
+
+    <!-- HOME -->
+    <div id="view-home" class="view active flex-1">
+      <section class="relative w-full h-[480px] md:h-[560px] overflow-hidden">
+        <div class="absolute inset-0">
+          <img id="heroImage" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=85" alt="Hero" class="w-full h-full object-cover object-center scale-105 transition-all duration-700">
+          <div class="absolute inset-0 hero-gradient"></div>
+          <div class="absolute inset-0 hero-side"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center max-w-2xl ml-0 md:ml-10 lg:ml-16">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass text-amber-400 text-xs font-semibold mb-4 w-fit shadow-md">
+            <i class="fa-solid fa-crown text-amber-400"></i>
+            <span>Trending Now</span>
+          </div>
+          <h1 id="heroTitle" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-3 drop-shadow-md">ONE PIECE</h1>
+          <div id="heroTags" class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium text-slate-300 mb-4"></div>
+          <p id="heroSynopsis" class="text-sm sm:text-base text-slate-300 line-clamp-3 mb-7 leading-relaxed max-w-xl">
+            Monkey D. Luffy and his crew set sail in search of the legendary One Piece, facing powerful enemies and unforgettable adventures along the way.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="playAnime('One Piece')" class="btn-3d px-7 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-500 text-white font-semibold flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-play text-xs"></i></span>
+              <span>Watch Now</span>
+            </button>
+            <button onclick="addToWatchlist('One Piece')" class="btn-ghost-3d px-6 py-3.5 rounded-2xl glass-strong text-slate-200 font-semibold flex items-center gap-2 hover:bg-white/10">
+              <i class="fa-solid fa-plus text-sm"></i>
+              <span>Add to Watchlist</span>
+            </button>
+          </div>
+        </div>
+        <button onclick="prevHero()" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full glass-strong text-slate-200 flex items-center justify-center hover:scale-110 transition-transform z-10">
+          <i class="fa-solid fa-chevron-left text-sm"></i>
+        </button>
+        <button onclick="nextHero()" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full glass-strong text-slate-200 flex items-center justify-center hover:scale-110 transition-transform z-10">
+          <i class="fa-solid fa-chevron-right text-sm"></i>
+        </button>
+        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10" id="heroDots"></div>
+      </section>
+
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
+        <section>
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center">
+                <i class="fa-solid fa-fire text-sm"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-white tracking-tight">Trending Now</h2>
+            </div>
+            <button onclick="showView('anime')" class="text-sm font-semibold text-violet-400 hover:text-violet-300 flex items-center gap-1.5 group">
+              <span>View All</span>
+              <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+            </button>
+          </div>
+          <div id="trendingGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5"></div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <section class="lg:col-span-2">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
+                <i class="fa-solid fa-layer-group text-sm"></i>
+              </div>
+              <h2 class="text-2xl font-bold text-white">Browse by Genre</h2>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5" id="genreGrid"></div>
+          </section>
+
+          <section>
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-violet-500/15 text-violet-400 flex items-center justify-center">
+                  <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">Continue Watching</h2>
+              </div>
+              <button onclick="showView('popular')" class="text-sm font-semibold text-violet-400 hover:text-violet-300">View All</button>
+            </div>
+            <div class="glass-card rounded-2xl p-4 space-y-3">
+              <div class="relative rounded-xl overflow-hidden group">
+                <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" alt="One Piece" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                <button onclick="playAnime('One Piece')" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-slate-950/30 backdrop-blur-[2px] transition-opacity">
+                  <div class="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-600/50">
+                    <i class="fa-solid fa-play ml-0.5"></i>
+                  </div>
+                </button>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-bold text-white">One Piece</h3>
+                  <span class="text-xs font-medium text-slate-400">Ep 1032</span>
+                </div>
+                <p class="text-xs text-slate-400">12 min left</p>
+                <div class="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-violet-500 to-indigo-400 h-full rounded-full w-3/4"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ANIME LIST -->
+    <div id="view-anime" class="view flex-1">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">All Anime</h1>
+            <p class="text-slate-400 text-sm mt-1">Discover thousands of series & movies</p>
+          </div>
+          <select id="sortSelect" onchange="renderAnimePage()" class="glass rounded-xl px-4 py-2.5 text-sm font-medium text-slate-200 border-0 outline-none focus:ring-2 focus:ring-violet-500/50 bg-transparent">
+            <option value="trending" class="bg-slate-900">Trending</option>
+            <option value="title" class="bg-slate-900">A–Z</option>
+            <option value="year" class="bg-slate-900">Newest</option>
+          </select>
+        </div>
+        <div id="animePageGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
+      </main>
+    </div>
+
+    <!-- GENRES -->
+    <div id="view-genres" class="view flex-1">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2">Browse Genres</h1>
+        <p class="text-slate-400 text-sm mb-8">Pick a mood and find your next favorite</p>
+        <div id="genresPageGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-12"></div>
+        <div id="genreResultsWrap" class="hidden">
+          <div class="flex items-center justify-between mb-5">
+            <h2 id="genreResultsTitle" class="text-xl font-bold text-white">Results</h2>
+            <button onclick="clearGenreFilter()" class="text-sm font-semibold text-violet-400 hover:text-violet-300">Clear filter</button>
+          </div>
+          <div id="genreResultsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- POPULAR -->
+    <div id="view-popular" class="view flex-1">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2">Continue Watching</h1>
+        <p class="text-slate-400 text-sm mb-8">Pick up right where you left off</p>
+        <div id="continueGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        <h2 class="text-2xl font-bold text-white mt-14 mb-6">Most Popular</h2>
+        <div id="popularGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
+      </main>
+    </div>
+
+    <!-- DETAIL -->
+    <div id="view-detail" class="view flex-1">
+      <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <button onclick="goBack()" class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-violet-300 transition-colors">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <div class="glass-card rounded-3xl overflow-hidden">
+          <div class="relative h-56 sm:h-72 md:h-80">
+            <img id="detailBanner" src="" alt="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/40 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+              <span id="detailGenre" class="text-xs font-semibold text-violet-400 uppercase tracking-wider"></span>
+              <h1 id="detailTitle" class="text-3xl sm:text-4xl font-extrabold text-white mt-1"></h1>
+            </div>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap gap-3">
+              <button onclick="startStream()" class="btn-3d px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-500 text-white font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-play"></i> Start Streaming
+              </button>
+              <button id="detailWatchlistBtn" onclick="toggleWatchlistDetail()" class="btn-ghost-3d px-5 py-3 rounded-2xl glass-strong text-slate-200 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Watchlist
+              </button>
+            </div>
+            <p id="detailSynopsis" class="text-slate-300 leading-relaxed text-sm sm:text-base"></p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Episodes</p>
+                <p id="detailEps" class="font-bold text-white mt-1">—</p>
+              </div>
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Year</p>
+                <p id="detailYear" class="font-bold text-white mt-1">—</p>
+              </div>
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Type</p>
+                <p id="detailType" class="font-bold text-white mt-1">TV</p>
+              </div>
+              <div class="glass rounded-xl p-4 text-center">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Status</p>
+                <p id="detailStatus" class="font-bold text-white mt-1">Airing</p>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-3">Episodes</h3>
+              <div id="episodeList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="mt-auto py-10 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-500 flex items-center justify-center text-white">
+            <i class="fa-solid fa-play text-xs"></i>
+          </div>
+          <span class="font-bold text-white">AniVerse</span>
+        </div>
+        <p class="text-xs text-slate-500 text-center">© 2026 AniVerse. All rights reserved. Built for anime enthusiasts worldwide.</p>
+        <div class="flex items-center gap-4 text-slate-500">
+          <a href="#" class="hover:text-violet-400 transition-colors"><i class="fa-brands fa-discord"></i></a>
+          <a href="#" class="hover:text-violet-400 transition-colors"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="hover:text-violet-400 transition-colors"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Search Modal -->
+  <div id="searchModal" class="fixed inset-0 z-[60] hidden items-start justify-center modal-overlay pt-20 p-4">
+    <div class="glass-strong rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-4">
+      <div class="relative flex items-center">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 text-slate-500"></i>
+        <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search anime by title or genre…" class="w-full bg-slate-900/60 border border-white/10 rounded-xl pl-11 pr-16 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-sm">
+        <button onclick="closeSearch()" class="absolute right-3 text-[11px] bg-slate-800 px-2 py-1 rounded-md text-slate-400 hover:text-white font-medium">ESC</button>
+      </div>
+      <div id="searchResults" class="space-y-1.5 max-h-72 overflow-y-auto">
+        <div class="p-4 rounded-xl bg-slate-900/40 text-xs text-slate-500 text-center">Type to search across 10,000+ anime titles</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Play Modal -->
+  <div id="playModal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-overlay p-4">
+    <div class="glass-strong rounded-2xl max-w-md w-full p-6 space-y-5 relative shadow-2xl">
+      <button onclick="closePlayModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div>
+        <span class="text-xs font-semibold text-violet-400 uppercase tracking-wider">Ready to watch</span>
+        <h3 id="playModalTitle" class="text-2xl font-bold text-white mt-1">Anime</h3>
+      </div>
+      <div class="w-full h-48 rounded-xl overflow-hidden relative bg-slate-800">
+        <img id="playModalImg" src="" alt="" class="w-full h-full object-cover">
+        <div class="absolute inset-0 flex items-center justify-center bg-slate-950/40">
+          <div class="w-14 h-14 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-600/50">
+            <i class="fa-solid fa-play text-xl ml-1"></i>
+          </div>
+        </div>
+      </div>
+      <p id="playModalDesc" class="text-sm text-slate-300 leading-relaxed"></p>
+      <div class="flex justify-end gap-2">
+        <button onclick="closePlayModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-sm hover:bg-slate-700">Close</button>
+        <button onclick="goToDetailFromModal()" class="px-5 py-2.5 rounded-xl bg-violet-600 text-white font-semibold text-sm shadow-md hover:bg-violet-500">Open Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[70] translate-y-24 opacity-0 glass-strong text-white px-5 py-3.5 rounded-2xl shadow-lg flex items-center gap-3 max-w-sm">
+    <i class="fa-solid fa-circle-check text-violet-400"></i>
+    <span id="toastMessage" class="text-sm font-medium"></span>
+  </div>
+
+  <script>
+    const heroSlides = [
+      { title: "ONE PIECE", image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1920&q=85", tags: ["Action", "Adventure", "Comedy", "1999", "TV"], synopsis: "Monkey D. Luffy and his crew set sail in search of the legendary One Piece, facing powerful enemies and unforgettable adventures along the way." },
+      { title: "JUJUTSU KAISEN", image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1920&q=85", tags: ["Action", "Supernatural", "Dark Fantasy", "2020", "TV"], synopsis: "A boy swallows a cursed talisman — the finger of a demon — and becomes cursed himself. He enters a shaman's school to locate the demon's other body parts and exorcise himself." },
+      { title: "ATTACK ON TITAN", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1920&q=85", tags: ["Action", "Drama", "Fantasy", "2013", "TV"], synopsis: "After his hometown is destroyed and his mother is lost, Eren Jaeger vows to cleanse the earth of the giant humanoid Titans that have brought humanity to the brink of extinction." },
+      { title: "DEMON SLAYER", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=85", tags: ["Action", "Fantasy", "Historical", "2019", "TV"], synopsis: "A family is slain by demons. A surviving brother and sister become demon slayers, searching for a cure for the sister's demonic affliction." },
+      { title: "SOLO LEVELING", image: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1920&q=85", tags: ["Action", "Fantasy", "Adventure", "2024", "TV"], synopsis: "In a world where hunters with magical powers battle deadly monsters, a weak hunter named Sung Jinwoo is close to death when a mysterious quest window opens before him." }
+    ];
+
+    const animeList = [
+      { title: "Jujutsu Kaisen", episodes: "24/24", genres: "Action • Supernatural", year: 2020, image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=500&q=80", synopsis: "A boy swallows a cursed talisman and becomes cursed himself, joining a secret school of jujutsu sorcerers.", status: "Completed" },
+      { title: "Attack on Titan", episodes: "87/87", genres: "Action • Drama", year: 2013, image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=500&q=80", synopsis: "Humanity lives inside walled cities barricaded from giant humanoid Titans.", status: "Completed" },
+      { title: "Demon Slayer", episodes: "26/26", genres: "Action • Fantasy", year: 2019, image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=500&q=80", synopsis: "Tanjiro Kamado sets out to become a demon slayer to save his sister and avenge his family.", status: "Ongoing" },
+      { title: "Naruto Shippuden", episodes: "500/500", genres: "Action • Adventure", year: 2007, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=500&q=80", synopsis: "Naruto Uzumaki wants to be recognized as the leader and strongest ninja of his village.", status: "Completed" },
+      { title: "My Hero Academia", episodes: "138/138", genres: "Action • Superhero", year: 2016, image: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=500&q=80", synopsis: "In a world where people with superpowers are normal, Izuku Midoriya aims to be a hero despite lacking powers.", status: "Ongoing" },
+      { title: "Solo Leveling", episodes: "12/12", genres: "Action • Fantasy", year: 2024, image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80", synopsis: "The weakest hunter gets gifted with a mysterious leveling system that changes his destiny.", status: "Ongoing" },
+      { title: "One Piece", episodes: "1100+", genres: "Action • Adventure • Comedy", year: 1999, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=500&q=80", synopsis: "Monkey D. Luffy and his crew set sail in search of the legendary One Piece.", status: "Ongoing" },
+      { title: "Spy x Family", episodes: "37/37", genres: "Comedy • Slice of Life", year: 2022, image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=500&q=80", synopsis: "A spy, an assassin and a telepath form an unlikely family for a secret mission.", status: "Ongoing" },
+      { title: "Chainsaw Man", episodes: "12/12", genres: "Action • Horror", year: 2022, image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=500&q=80", synopsis: "Denji becomes Chainsaw Man after merging with his devil pet Pochita.", status: "Completed" },
+      { title: "Frieren", episodes: "28/28", genres: "Fantasy • Adventure", year: 2023, image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=500&q=80", synopsis: "An elf mage reflects on her past journey after the hero's party defeats the Demon King.", status: "Completed" }
+    ];
+
+    const genres = [
+      { name: "Action", icon: "fa-bolt", color: "bg-red-500/15 text-red-400" },
+      { name: "Adventure", icon: "fa-mountain", color: "bg-emerald-500/15 text-emerald-400" },
+      { name: "Comedy", icon: "fa-face-smile", color: "bg-amber-500/15 text-amber-400" },
+      { name: "Drama", icon: "fa-masks-theater", color: "bg-purple-500/15 text-purple-400" },
+      { name: "Fantasy", icon: "fa-wand-magic-sparkles", color: "bg-blue-500/15 text-blue-400" },
+      { name: "Horror", icon: "fa-skull", color: "bg-rose-500/15 text-rose-400" },
+      { name: "Romance", icon: "fa-heart", color: "bg-pink-500/15 text-pink-400" },
+      { name: "Slice of Life", icon: "fa-seedling", color: "bg-teal-500/15 text-teal-400" },
+      { name: "Supernatural", icon: "fa-ghost", color: "bg-indigo-500/15 text-indigo-400" },
+      { name: "Superhero", icon: "fa-shield-halved", color: "bg-sky-500/15 text-sky-400" }
+    ];
+
+    const continueList = [
+      { title: "One Piece", ep: "Ep 1032", left: "12 min left", progress: 75, image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80" },
+      { title: "Jujutsu Kaisen", ep: "Ep 18", left: "8 min left", progress: 60, image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" },
+      { title: "Demon Slayer", ep: "Ep 9", left: "15 min left", progress: 40, image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    let currentHero = 0;
+    let currentDetail = null;
+    let previousView = "home";
+    let watchlist = new Set();
+
+    function showView(name) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      const el = document.getElementById("view-" + name);
+      if (el) el.classList.add("active");
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        const isActive = btn.dataset.view === name;
+        btn.classList.toggle("bg-violet-500/20", isActive);
+        btn.classList.toggle("text-violet-300", isActive);
+        btn.classList.toggle("border", isActive);
+        btn.classList.toggle("border-violet-500/30", isActive);
+        btn.classList.toggle("font-semibold", isActive);
+        btn.classList.toggle("text-slate-400", !isActive);
+        btn.classList.toggle("font-medium", !isActive);
+      });
+      if (name === "anime") renderAnimePage();
+      if (name === "genres") renderGenresPage();
+      if (name === "popular") renderPopularPage();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goBack() { showView(previousView || "home"); }
+
+    function setHero(i) {
+      currentHero = i;
+      const s = heroSlides[i];
+      document.getElementById("heroImage").src = s.image;
+      document.getElementById("heroTitle").textContent = s.title;
+      document.getElementById("heroSynopsis").textContent = s.synopsis;
+      document.getElementById("heroTags").innerHTML = s.tags.map((t, idx) => {
+        if (idx === s.tags.length - 2) return `<span class="flex items-center gap-1 glass px-2.5 py-1 rounded-lg"><i class="fa-regular fa-calendar text-slate-400 text-xs"></i><span>${t}</span></span>`;
+        if (idx === s.tags.length - 1) return `<span class="px-2.5 py-1 rounded-lg bg-violet-500/25 text-violet-300 font-bold text-xs border border-violet-500/40">${t}</span>`;
+        return `<span class="px-2.5 py-1 rounded-lg glass text-slate-300">${t}</span>`;
+      }).join("");
+      document.querySelectorAll(".hero-dot").forEach((d, idx) => {
+        d.className = idx === i ? "hero-dot w-7 h-2 rounded-full bg-violet-500 transition-all" : "hero-dot w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-400 transition-all";
+      });
+    }
+    function nextHero() { setHero((currentHero + 1) % heroSlides.length); }
+    function prevHero() { setHero((currentHero - 1 + heroSlides.length) % heroSlides.length); }
+    setInterval(nextHero, 6500);
+
+    function animeCard(a) {
+      return `
+        <div onclick="openDetail('${a.title.replace(/'/g, "\\'")}')" class="glass-card rounded-2xl overflow-hidden cursor-pointer flex flex-col">
+          <div class="relative h-52 overflow-hidden">
+            <img src="${a.image}" alt="${a.title}" class="w-full h-full object-cover transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-slate-900/85 backdrop-blur text-[10px] font-bold text-white border border-white/10">${a.episodes}</span>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-slate-950/40 backdrop-blur-[1px] transition-opacity">
+              <div class="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+            </div>
+          </div>
+          <div class="p-3.5 flex-1 flex flex-col justify-between">
+            <h3 class="font-bold text-white text-sm line-clamp-1">${a.title}</h3>
+            <p class="text-[11px] text-slate-400 mt-1">${a.genres}</p>
+          </div>
+        </div>`;
+    }
+
+    function renderTrending() {
+      document.getElementById("trendingGrid").innerHTML = animeList.slice(0, 6).map(animeCard).join("");
+    }
+
+    function renderGenreHome() {
+      document.getElementById("genreGrid").innerHTML = genres.slice(0, 8).map(g => `
+        <button onclick="filterGenre('${g.name}')" class="glass-card rounded-2xl p-5 flex flex-col items-center gap-3 group">
+          <div class="w-12 h-12 rounded-xl ${g.color} flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="fa-solid ${g.icon} text-lg"></i>
+          </div>
+          <span class="text-sm font-semibold text-slate-200 group-hover:text-violet-300">${g.name}</span>
+        </button>`).join("");
+    }
+
+    function renderAnimePage() {
+      let list = [...animeList];
+      const sort = document.getElementById("sortSelect")?.value || "trending";
+      if (sort === "title") list.sort((a, b) => a.title.localeCompare(b.title));
+      if (sort === "year") list.sort((a, b) => b.year - a.year);
+      document.getElementById("animePageGrid").innerHTML = list.map(animeCard).join("");
+    }
+
+    function renderGenresPage() {
+      document.getElementById("genresPageGrid").innerHTML = genres.map(g => `
+        <button onclick="filterGenre('${g.name}')" class="glass-card rounded-2xl p-6 flex flex-col items-center gap-3 group">
+          <div class="w-14 h-14 rounded-2xl ${g.color} flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="fa-solid ${g.icon} text-xl"></i>
+          </div>
+          <span class="text-sm font-semibold text-slate-200">${g.name}</span>
+        </button>`).join("");
+    }
+
+    function filterGenre(genre) {
+      showView("genres");
+      const filtered = animeList.filter(a => a.genres.toLowerCase().includes(genre.toLowerCase()));
+      document.getElementById("genreResultsWrap").classList.remove("hidden");
+      document.getElementById("genreResultsTitle").textContent = `${genre} · ${filtered.length} titles`;
+      document.getElementById("genreResultsGrid").innerHTML = filtered.length
+        ? filtered.map(animeCard).join("")
+        : `<p class="col-span-full text-center text-slate-500 py-8">No anime found in this genre yet.</p>`;
+      showToast(`Showing ${genre} anime`);
+    }
+
+    function clearGenreFilter() {
+      document.getElementById("genreResultsWrap").classList.add("hidden");
+    }
+
+    function renderPopularPage() {
+      document.getElementById("continueGrid").innerHTML = continueList.map(c => `
+        <div class="glass-card rounded-2xl p-4 flex gap-4 cursor-pointer" onclick="openDetail('${c.title.replace(/'/g, "\\'")}')">
+          <img src="${c.image}" class="w-28 h-20 rounded-xl object-cover shrink-0" alt="">
+          <div class="flex-1 min-w-0 flex flex-col justify-center">
+            <h3 class="font-bold text-white text-sm truncate">${c.title}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">${c.ep} · ${c.left}</p>
+            <div class="w-full bg-slate-800/80 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-violet-500 to-indigo-400 h-full rounded-full" style="width:${c.progress}%"></div>
+            </div>
+          </div>
+        </div>`).join("");
+      document.getElementById("popularGrid").innerHTML = animeList.map(animeCard).join("");
+    }
+
+    function openDetail(title) {
+      previousView = document.querySelector(".view.active")?.id?.replace("view-", "") || "home";
+      const a = animeList.find(x => x.title === title) || {
+        title, episodes: "—", genres: "Action • Adventure", year: "—", image: heroSlides[0].image,
+        synopsis: "Experience high-octane action, breathtaking animation, and immersive storytelling.", status: "Airing"
+      };
+      currentDetail = a;
+      document.getElementById("detailBanner").src = a.image;
+      document.getElementById("detailTitle").textContent = a.title;
+      document.getElementById("detailGenre").textContent = a.genres;
+      document.getElementById("detailSynopsis").textContent = a.synopsis;
+      document.getElementById("detailEps").textContent = a.episodes;
+      document.getElementById("detailYear").textContent = a.year;
+      document.getElementById("detailType").textContent = "TV";
+      document.getElementById("detailStatus").textContent = a.status || "Airing";
+      updateWatchlistBtn();
+      const eps = parseInt(String(a.episodes).split("/")[0]) || 12;
+      const count = Math.min(eps, 12);
+      document.getElementById("episodeList").innerHTML = Array.from({ length: count }, (_, i) => `
+        <button onclick="showToast('Playing Episode ${i + 1}…')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl glass hover:bg-white/5 transition-colors text-left">
+          <span class="text-sm font-medium text-slate-200">Episode ${i + 1}</span>
+          <i class="fa-solid fa-play text-xs text-violet-400"></i>
+        </button>`).join("");
+      showView("detail");
+    }
+
+    function startStream() { showToast(`Starting stream: ${currentDetail?.title || "Anime"}…`); }
+
+    function toggleWatchlistDetail() {
+      if (!currentDetail) return;
+      const t = currentDetail.title;
+      if (watchlist.has(t)) { watchlist.delete(t); showToast(`Removed "${t}" from Watchlist`); }
+      else { watchlist.add(t); showToast(`Added "${t}" to Watchlist`); }
+      updateWatchlistBtn();
+    }
+
+    function updateWatchlistBtn() {
+      const btn = document.getElementById("detailWatchlistBtn");
+      if (!btn || !currentDetail) return;
+      btn.innerHTML = watchlist.has(currentDetail.title)
+        ? `<i class="fa-solid fa-check"></i> In Watchlist`
+        : `<i class="fa-solid fa-plus"></i> Watchlist`;
+    }
+
+    function playAnime(title) {
+      const a = animeList.find(x => x.title === title) || {
+        title, genres: "Action • Adventure", image: heroSlides[0].image,
+        synopsis: "Experience high-octane action and immersive storytelling."
+      };
+      currentDetail = a;
+      document.getElementById("playModalTitle").textContent = a.title;
+      document.getElementById("playModalImg").src = a.image;
+      document.getElementById("playModalDesc").textContent = a.synopsis;
+      const m = document.getElementById("playModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+    }
+
+    function closePlayModal() {
+      const m = document.getElementById("playModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    }
+
+    function goToDetailFromModal() {
+      closePlayModal();
+      if (currentDetail) openDetail(currentDetail.title);
+    }
+
+    function addToWatchlist(title) {
+      watchlist.add(title);
+      showToast(`Added "${title}" to your Watchlist!`);
+    }
+
+    function openSearch() {
+      const m = document.getElementById("searchModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+      document.getElementById("searchInput").focus();
+    }
+    function closeSearch() {
+      const m = document.getElementById("searchModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    }
+    function handleSearch(q) {
+      const box = document.getElementById("searchResults");
+      if (!q.trim()) {
+        box.innerHTML = `<div class="p-4 rounded-xl bg-slate-900/40 text-xs text-slate-500 text-center">Type to search across 10,000+ anime titles</div>`;
+        return;
+      }
+      const f = animeList.filter(a => a.title.toLowerCase().includes(q.toLowerCase()) || a.genres.toLowerCase().includes(q.toLowerCase()));
+      if (!f.length) {
+        box.innerHTML = `<div class="p-4 rounded-xl bg-slate-900/40 text-xs text-slate-500 text-center">No anime found matching "${q}"</div>`;
+        return;
+      }
+      box.innerHTML = f.map(a => `
+        <div onclick="closeSearch(); openDetail('${a.title.replace(/'/g, "\\'")}')" class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-800/80 cursor-pointer transition-colors">
+          <img src="${a.image}" class="w-12 h-12 rounded-lg object-cover" alt="">
+          <div>
+            <h4 class="font-bold text-white text-sm">${a.title}</h4>
+            <p class="text-xs text-slate-400">${a.genres} · ${a.episodes}</p>
+          </div>
+        </div>`).join("");
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      document.getElementById("toastMessage").textContent = msg;
+      t.classList.add("show");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+    function toggleMobile() {
+      document.getElementById("mobileMenu").classList.toggle("hidden");
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") { closeSearch(); closePlayModal(); }
+    });
+
+    window.onload = () => {
+      document.getElementById("heroDots").innerHTML = heroSlides.map((_, i) =>
+        `<button onclick="setHero(${i})" class="hero-dot ${i === 0 ? 'w-7 h-2 rounded-full bg-violet-500' : 'w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-400'} transition-all"></button>`
+      ).join("");
+      setHero(0);
+      renderTrending();
+      renderGenreHome();
+    };
+  </script>
+</body>
+</html>
