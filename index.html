@@ -198,9 +198,9 @@
 
           <!-- Right actions -->
           <div class="flex items-center gap-3">
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-600 hover:text-indigo-600 transition-all shadow-sm" title="Theme">
-              <i id="themeIcon" class="fa-solid fa-sun text-sm"></i>
-            </button>
+          <button onclick="window.location.href='aniverse-dark.html'" class="w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-600 hover:text-indigo-600 transition-all shadow-sm" title="Switch to Dark">
+              <i class="fa-solid fa-moon text-sm"></i>
+          </button>
             <button onclick="showToast('No new notifications')" class="relative w-10 h-10 rounded-xl glass flex items-center justify-center text-slate-600 hover:text-indigo-600 transition-all shadow-sm">
               <i class="fa-solid fa-bell text-sm"></i>
               <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -827,19 +827,6 @@
 
     function toggleMobile() {
       document.getElementById("mobileMenu").classList.toggle("hidden");
-    }
-
-    function toggleTheme() {
-      const icon = document.getElementById("themeIcon");
-      if (icon.classList.contains("fa-sun")) {
-        icon.classList.replace("fa-sun", "fa-moon");
-        document.body.style.filter = "brightness(0.92) contrast(1.05)";
-        showToast("Soft dusk mode");
-      } else {
-        icon.classList.replace("fa-moon", "fa-sun");
-        document.body.style.filter = "";
-        showToast("Bright sky mode");
-      }
     }
 
     // ESC close modals
